@@ -62,6 +62,10 @@ sed -i "s/#%wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g" /etc/sudoers
 ```
 
 ```
+stywen ALL=NOPASSWD:/bin/reboot,/bin/poweroff
+```
+
+```
 sed -i "s/#[multilib]/[multilib]/g" /etc/pacman.conf
 ```
 
