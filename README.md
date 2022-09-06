@@ -58,11 +58,22 @@ useradd -m stywen && usermod -G wheel stywen && passwd stywen
 ```
 
 ```
-EDITOR=vim visudo
+sed -i "s/#%wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g" /etc/sudoers
 ```
 
 ```
-vim /etc/pacman.conf
+sed -i "s/#[multilib]/[multilib]/g" /etc/pacman.conf
+```
+
+```
+sed -i "s/#Include = /etc/pacman.d/mirrorlist/Include = /etc/pacman.d/mirrorlist/g" /etc/pacman.conf
+```
+
+
+
+
+```
+vim 
 ```
 
 ```
