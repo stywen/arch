@@ -76,7 +76,7 @@ sed -i "s/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g" /etc/sudoers
 
 ## passwordless commands
 ```
-echo "stywen ALL=NOPASSWD:/usr/bin/reboot" >> /etc/sudoers && echo "stywen ALL=NOPASSWD:/usr/bin/poweroff" >> /etc/sudoers && echo "stywen ALL=NOPASSWD:/usr/bin/virsh" >> /etc/sudoers
+echo "myname ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 ```
 
 ## setup multilib
