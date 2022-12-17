@@ -1,60 +1,103 @@
 # basic arch installation
 ## wipe nvme0n1
-```wipefs -a /dev/nvme0n1```
+```
+wipefs -a /dev/nvme0n1
+```
 
 ## create partitions
-```cfdisk /dev/nvme0n1```
+```
+cfdisk /dev/nvme0n1
+```
 
 ## format partitions and label them
-```yes | mkfs.fat /dev/nvme0n1p1 && yes | mkfs.ext4 -L ROOT /dev/nvme0n1p2 && yes| mkfs.ext4 -L HOME /dev/nvme0n1p3 && yes | mkfs.ext4 -L DATA /dev/nvme0n1p4 && fatlabel /dev/nvme0n1p1 BOOT```
+```
+yes | mkfs.fat /dev/nvme0n1p1 && yes | mkfs.ext4 -L ROOT /dev/nvme0n1p2 && yes| mkfs.ext4 -L HOME /dev/nvme0n1p3 && yes | mkfs.ext4 -L DATA /dev/nvme0n1p4 && fatlabel /dev/nvme0n1p1 BOOT
+```
 
 ## mount partitions
-```mount /dev/nvme0n1p2 /mnt && mkdir /mnt/{boot,home,data,Virtualization} && mount /dev/nvme0n1p1 /mnt/boot && mount /dev/nvme0n1p3 /mnt/home && mount /dev/nvme0n1p4 /mnt/data && mount /dev/nvme1n1 /mnt/Virtualization/```
+```
+mount /dev/nvme0n1p2 /mnt && mkdir /mnt/{boot,home,data,Virtualization} && mount /dev/nvme0n1p1 /mnt/boot && mount /dev/nvme0n1p3 /mnt/home && mount /dev/nvme0n1p4 /mnt/data && mount /dev/nvme1n1 /mnt/Virtualization/
+```
 
 ## set ntp
-```timedatectl set-ntp true```
+```
+timedatectl set-ntp true
+```
 
 ## change mirrors
-```reflector --country Germany,Austria --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist```
+```
+reflector --country Germany,Austria --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+```
 
 ## install basic system and packages
-```pacstrap /mnt base base-devel linux linux-firmware python3 grub efibootmgr os-prober networkmanager ntp openssh vim neofetch```
+```
+pacstrap /mnt base base-devel linux linux-firmware python3 grub efibootmgr os-prober networkmanager ntp openssh vim neofetch
+```
 
 ## generate fstab
-```genfstab -U /mnt >> /mnt/etc/fstab```
+```
+genfstab -U /mnt >> /mnt/etc/fstab
+```
 
 ## chroot into new system
-```arch-chroot /mnt```
+```
+arch-chroot /mnt
+```
 
 ## enable services
-```systemctl enable NetworkManager.service && systemctl enable sshd.service```
+```
+systemctl enable NetworkManager.service && systemctl enable sshd.service
+```
 
 ## setup locale etc.
-```echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && echo "KEYMAP=us" >> /etc/vconsole.conf && echo "LANG=en_US.UTF-8" >> /etc/locale.conf && locale-gen && echo "LANG=en_US.UTF-8" >> /etc/locale.conf```
+```
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && echo "KEYMAP=us" >> /etc/vconsole.conf && echo "LANG=en_US.UTF-8" >> /etc/locale.conf && locale-gen && echo "LANG=en_US.UTF-8" >> /etc/locale.conf
+```
 
 ## setup grub
-```grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=grub && grub-mkconfig -o /boot/grub/grub.cfg```
+```
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=grub && grub-mkconfig -o /boot/grub/grub.cfg
+```
 
 ## setup root password
-```passwd```
+```
+passwd
+```
 
 ## add user stywen
-```useradd -m stywen && usermod -G wheel stywen && passwd stywen```
+```
+useradd -m stywen && usermod -G wheel stywen && passwd stywen
+```
 
 ## enable wheel
-```sed -i "s/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g" /etc/sudoers```
+```
+sed -i "s/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g" /etc/sudoers
+```
 
 ## passwordless commands
-```echo "stywen ALL=NOPASSWD:/usr/bin/reboot", echo "stywen ALL=NOPASSWD:/usr/bin/poweroff",echo "stywen ALL=NOPASSWD:/usr/bin/virsh"```
+```
+echo "stywen ALL=NOPASSWD:/usr/bin/reboot" >> /etc/sudoers && echo "stywen ALL=NOPASSWD:/usr/bin/poweroff" >> /etc/sudoers && echo "stywen ALL=NOPASSWD:/usr/bin/virsh" >> /etc/sudoers
+```
 
 ## setup multilib
-```sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf```
+```
+sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+```
 
 ### note
 
+```
 sudo ethtool enp38s0 | grep wake-on
+```
+
+```
 sudo ethtool -s enp38s0 wol g
+```
+
+```
 sudo vim /etc/systemd/system/wol.service
+```
+
 ```
 [Unit]
 Description=Configure Wake-up on LAN
@@ -67,4 +110,6 @@ ExecStart=/sbin/ethtool -s enp3s0 wol g
 WantedBy=basic.target
 ```
 
+```
 sudo systemctl enable wol@enp38s0.service
+```
